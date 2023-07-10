@@ -25,6 +25,7 @@ import {
 } from '../redux/playerSlice';
 import Slider from '@react-native-community/slider';
 import {convertSecondsIntoMinutesAndSeconds} from '../features/utils/utilFunctions';
+import {BlurView} from '@react-native-community/blur';
 
 const img = require('../public/music.jpeg');
 
@@ -93,12 +94,12 @@ const ProgressModal = () => {
         statusBarTranslucent={true}
         transparent={true}>
         {/* for making blurred backdrop */}
-        {/* <BlurView
+        <BlurView
           style={styles.absolute}
           blurType="light"
           blurAmount={10}
           reducedTransparencyFallbackColor="white"
-        /> */}
+        />
 
         <TouchableWithoutFeedback
           onPress={() => dispatch(toggleIsModalOpen(false))}>

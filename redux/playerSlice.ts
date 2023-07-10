@@ -31,7 +31,6 @@ const playerSlice = createSlice({
         state.currentTrack = trackList.filter(
           item => item.id === action.payload.id,
         )[0];
-        return;
       } else {
         const newValue = action.payload;
         state.currentTrack = newValue;
