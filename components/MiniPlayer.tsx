@@ -16,6 +16,8 @@ const MiniPlayer = () => {
   const {handlePreviousPress, handleNextPress, handlePlayPress} =
     useMusicPlayerUtils();
 
+  const {currentTrack} = useSelector((store: RootState) => store.player);
+
   return (
     <TouchableOpacity
       onPress={() => dispatch(toggleIsModalOpen(true))}
@@ -23,8 +25,10 @@ const MiniPlayer = () => {
       className=" flex flex-row absolute bottom-0 left-0 bg-[#112] w-full z-50 rounded-t-xl border-t-2 border-sky-600 px-4 pb-3 pt-2 items-center">
       <Image source={musicSpinner} className="w-12 h-12 mr-3" />
       <View className="flex-1">
-        <Text className="font-semibold text-lg text-white">Uptown Funk </Text>
-        <Text className="text-gray-400">Mark Ronson ft. Bruno Mars</Text>
+        <Text className="font-semibold text-lg text-white">
+          {currentTrack.title}
+        </Text>
+        <Text className="text-gray-400">{currentTrack.artist}</Text>
       </View>
       <View className="flex flex-row items-center justify-center gap-x-3">
         <TouchableOpacity activeOpacity={0.8} onPress={handlePreviousPress}>

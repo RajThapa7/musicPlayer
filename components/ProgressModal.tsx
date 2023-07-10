@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   GestureResponderEvent,
   Image,
@@ -9,20 +9,44 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import {View} from 'react-native';
-import TrackPlayer, {State} from 'react-native-track-player';
+import TrackPlayer, {
+  Event,
+  State,
+  useProgress,
+  useTrackPlayerEvents,
+} from 'react-native-track-player';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/store';
-import {toggleIsModalOpen, toggleIsPlaying} from '../redux/playerSlice';
+import {
+  setCurrentTrack,
+  toggleIsModalOpen,
+  toggleIsPlaying,
+} from '../redux/playerSlice';
+import Slider from '@react-native-community/slider';
+import {convertSecondsIntoMinutesAndSeconds} from '../features/utils/utilFunctions';
 
 const img = require('../public/music.jpeg');
 
-const ProgressModal = () => {
-  const {isPlaying} = useSelector((store: RootState) => store.player);
-  const {isModalOpen} = useSelector((store: RootState) => store.player);
+const events = [Event.PlaybackTrackChanged];
 
-  // const {position, buffered, duration} = useProgress();
+const ProgressModal = () => {
+  const {isModalOpen, isPlaying} = useSelector(
+    (store: RootState) => store.player,
+  );
+
+  const {position, duration} = useProgress();
+
   const dispatch = useDispatch();
+
+  useTrackPlayerEvents(events, event => {
+    if (event.type === Event.PlaybackTrackChanged) {
+      TrackPlayer.getCurrentTrack().then(index => {
+        console.log(index, 'index');
+        dispatch(setCurrentTrack({id: index}));
+      });
+    }
+  });
 
   const handlePreviousPress = useCallback(async () => {
     TrackPlayer.skipToPrevious();
@@ -45,6 +69,19 @@ const ProgressModal = () => {
     TrackPlayer.play();
     dispatch(toggleIsPlaying(true));
   }, [dispatch]);
+
+  const handleSliderChange = async (value: number) => {
+    setSliderValue(value);
+    await TrackPlayer.seekTo(value);
+  };
+
+  const {currentTrack} = useSelector((store: RootState) => store.player);
+
+  const [sliderValue, setSliderValue] = useState(position);
+
+  useEffect(() => {
+    setSliderValue(position);
+  }, [position]);
 
   return (
     <View>
@@ -83,9 +120,30 @@ const ProgressModal = () => {
 
           <View className="w-full mb-5">
             <Text className="text-2xl font-bold text-white text-center">
-              Uptown Funk
+              {currentTrack.title}
             </Text>
-            <Text className="text-center">Uptown Funk</Text>
+            <Text className="text-center">{currentTrack.artist}</Text>
+          </View>
+
+          {/* slider  */}
+          <View className="flex w-full items-center pb-6 pt-8">
+            <Slider
+              minimumValue={0}
+              maximumValue={duration}
+              minimumTrackTintColor="#FFFFFF"
+              maximumTrackTintColor="#8a8888"
+              value={sliderValue}
+              onValueChange={handleSliderChange}
+              style={styles.slider}
+            />
+            <View className="flex flex-row w-full justify-between px-12">
+              <Text className="text-xs">
+                {convertSecondsIntoMinutesAndSeconds(position)}
+              </Text>
+              <Text className="text-xs">
+                {convertSecondsIntoMinutesAndSeconds(duration)}
+              </Text>
+            </View>
           </View>
 
           {/* player controls */}
@@ -156,6 +214,9 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     right: 0,
+  },
+  slider: {
+    width: 330,
   },
 });
 

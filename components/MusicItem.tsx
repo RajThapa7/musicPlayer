@@ -8,7 +8,11 @@ import TrackPlayer, {
   useTrackPlayerEvents,
 } from 'react-native-track-player';
 import {useDispatch} from 'react-redux';
-import {toggleIsModalOpen, toggleIsPlaying} from '../redux/playerSlice';
+import {
+  toggleIsModalOpen,
+  toggleIsPlaying,
+  setCurrentTrack,
+} from '../redux/playerSlice';
 
 const img = require('../public/music.jpeg');
 
@@ -31,6 +35,7 @@ const MusicItem = ({title, artist, id}: IMusicItem) => {
 
   const handlePlayPress = async () => {
     dispatch(toggleIsModalOpen(true));
+    dispatch(setCurrentTrack({title, artist}));
     if (currentTrackIndex === id) {
       if ((await TrackPlayer.getState()) === State.Playing) {
         TrackPlayer.pause();
