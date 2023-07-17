@@ -6,6 +6,7 @@ import MusicList from './features/MusicList';
 import {Provider} from 'react-redux';
 import {store} from './redux/store';
 import ProgressModal from './components/ProgressModal';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 function App() {
   const [isPlayerReady, setIsPlayerReady] = useState(false);
@@ -35,10 +36,12 @@ function App() {
 
   return (
     <Provider store={store}>
-      <View style={styles.container}>
-        <MusicList />
-        <ProgressModal />
-      </View>
+      <GestureHandlerRootView style={{flex: 1}}>
+        <View style={styles.container}>
+          <MusicList />
+          <ProgressModal />
+        </View>
+      </GestureHandlerRootView>
     </Provider>
   );
 }
